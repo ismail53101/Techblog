@@ -10,16 +10,34 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * Admin-only content importer. Replaces the temporary /api/setup with a
- * session-protected endpoint. POST { reset?: boolean } (default true):
- *  - upserts the standard categories
- *  - when reset: deletes existing posts + tags (removes demo content) and
- *    prunes categories not in the standard set
- *  - imports the bundled starter articles
+ * Resolve the author for imported posts.
+ * Normal path: an authenticated ADMIN session.
+ * One-time bootstrap path: `Authorization: Bearer <IMPORT_TOKEN>` — only active
+ * while the IMPORT_TOKEN env var is set (removed after the initial import).
  */
-export async function POST(request: Request) {
+async function resolveAuthor(
+  request: Request
+): Promise<{ authorId: string } | { error: Response }> {
+  const importToken = process.env.IMPORT_TOKEN;
+  const auth = request.headers.get("authorization");
+  if (importToken && auth === `Bearer ${importToken}`) {
+    const admin = await prisma.user.findFirst({
+      where: { role: "ADMIN" },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (!admin) return { error: serverError("No admin user found to attribute posts to") };
+    return { authorId: admin.id };
+  }
   const { user, response } = await requireAuth(["ADMIN"]);
-  if (response) return response;
+  if (response) return { error: response };
+  return { authorId: user.id };
+}
+
+export async function POST(request: Request) {
+  const authResult = await resolveAuthor(request);
+  if ("error" in authResult) return authResult.error;
+  const authorId = authResult.authorId;
 
   let body: { reset?: boolean } = {};
   try {
@@ -72,7 +90,7 @@ export async function POST(request: Request) {
           metaTitle: a.metaTitle || a.title,
           metaDescription: a.metaDescription || a.excerpt,
           publishedAt: new Date(now - i * 36 * 3600 * 1000),
-          author: { connect: { id: user.id } },
+          author: { connect: { id: authorId } },
           category: { connect: { id: categoryId } },
           tags: {
             connectOrCreate: a.tags.map((t) => ({

@@ -201,3 +201,27 @@
 .hljs-strong {
   font-weight: 700;
 }
+
+/* Clean, ink-friendly printing of articles */
+@media print {
+  header,
+  footer,
+  [role="progressbar"],
+  [aria-label="Article audio player"] {
+    display: none !important;
+  }
+  .container {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .prose {
+    max-width: none !important;
+  }
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  article {
+    padding: 0 !important;
+  }
+}

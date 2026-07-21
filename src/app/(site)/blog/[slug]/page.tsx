@@ -2,22 +2,25 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Clock, Eye } from "lucide-react";
-import { getPublishedPostBySlug, getRelatedPosts, incrementViews } from "@/lib/posts";
+import { getAdjacentPosts, getPublishedPostBySlug, getRelatedPosts, incrementViews } from "@/lib/posts";
 import { addHeadingIds, extractToc } from "@/lib/toc";
 import { sanitize } from "@/lib/sanitize";
 import { buildMetadata, jsonLdArticle, jsonLdBreadcrumb, jsonLdFaq } from "@/lib/seo";
 import { extractFaq } from "@/lib/faq";
 import { TrackView } from "@/components/analytics/track-view";
-import { absoluteUrl, toISO } from "@/lib/utils";
+import { absoluteUrl, stripHtml, toISO } from "@/lib/utils";
 import { Breadcrumbs, type Crumb } from "@/components/blog/breadcrumbs";
 import { PostBody } from "@/components/blog/post-body";
 import { PostMeta } from "@/components/blog/post-meta";
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { ReadingProgress } from "@/components/blog/reading-progress";
+import { ArticleAudioPlayer } from "@/components/blog/article-audio-player";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BookmarkButton } from "@/components/blog/bookmark-button";
+import { PrintButton } from "@/components/blog/print-button";
 import { AuthorCard } from "@/components/blog/author-card";
 import { RelatedArticles } from "@/components/blog/related-articles";
+import { PostNavigation } from "@/components/blog/post-navigation";
 import { CategoryBadge } from "@/components/blog/category-badge";
 import { TagList } from "@/components/blog/tag-list";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -53,11 +56,15 @@ export default async function ArticlePage({ params }: Params) {
   const safeHtml = addHeadingIds(sanitize(post.content));
   const toc = extractToc(safeHtml);
   const faq = extractFaq(safeHtml);
-  const related = await getRelatedPosts({
-    postId: post.id,
-    categorySlug: post.category?.slug,
-    tagSlugs: post.tags.map((t) => t.slug),
-  });
+  const audioText = [post.title, post.excerpt, stripHtml(safeHtml)].filter(Boolean).join(". ");
+  const [related, adjacent] = await Promise.all([
+    getRelatedPosts({
+      postId: post.id,
+      categorySlug: post.category?.slug,
+      tagSlugs: post.tags.map((t) => t.slug),
+    }),
+    getAdjacentPosts({ id: post.id, publishedAt: post.publishedAt }),
+  ]);
 
   const url = absoluteUrl(`/blog/${post.slug}`);
   const crumbs: Crumb[] = [
@@ -110,10 +117,14 @@ export default async function ArticlePage({ params }: Params) {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">{post.excerpt}</p>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-border py-4">
+          {/* Listen to this article — browser Text-to-Speech, directly below the title */}
+          <ArticleAudioPlayer text={audioText} title={post.title} storageKey={post.slug} />
+
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-4 border-y border-border py-4 print:hidden">
             <PostMeta author={post.author} date={post.publishedAt} />
             <div className="flex items-center gap-2">
               <ShareButtons url={url} title={post.title} className="hidden sm:flex" />
+              <PrintButton className="hidden sm:inline-flex" />
               <BookmarkButton slug={post.slug} title={post.title} withLabel />
             </div>
           </div>
@@ -144,9 +155,12 @@ export default async function ArticlePage({ params }: Params) {
               </div>
             )}
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 print:hidden">
               <ShareButtons url={url} title={post.title} />
-              <BookmarkButton slug={post.slug} title={post.title} withLabel />
+              <div className="flex items-center gap-2">
+                <PrintButton />
+                <BookmarkButton slug={post.slug} title={post.title} withLabel />
+              </div>
             </div>
 
             <div className="mt-10">
@@ -154,13 +168,17 @@ export default async function ArticlePage({ params }: Params) {
             </div>
           </div>
 
-          <aside className="hidden lg:block">
+          <aside className="hidden lg:block print:hidden">
             <div className="sticky top-24">
               <TableOfContents items={toc} />
             </div>
           </aside>
         </div>
       </article>
+
+      <div className="pb-12 print:hidden">
+        <PostNavigation prev={adjacent.prev} next={adjacent.next} />
+      </div>
 
       <RelatedArticles posts={related} />
     </>

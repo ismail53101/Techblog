@@ -335,3 +335,117 @@ export async function getAuthorById(id: string) {
     },
   });
 }
+
+/** Most recently *updated* published posts (for the "Recently updated" rail). */
+export async function getRecentlyUpdatedPosts(limit = 4): Promise<PostCard[]> {
+  try {
+    return await prisma.post.findMany({
+      where: publishedWhere(),
+      select: postCardSelect,
+      orderBy: { updatedAt: "desc" },
+      take: limit,
+    });
+  } catch {
+    return [];
+  }
+}
+
+/** Latest published posts within a single category (by slug). */
+export async function getPostsByCategory(slug: string, limit = 3): Promise<PostCard[]> {
+  try {
+    return await prisma.post.findMany({
+      where: { ...publishedWhere(), category: { slug } },
+      select: postCardSelect,
+      orderBy: { publishedAt: "desc" },
+      take: limit,
+    });
+  } catch {
+    return [];
+  }
+}
+
+export type AdjacentPost = { title: string; slug: string; coverImage: string | null };
+export type AdjacentPosts = { prev: AdjacentPost | null; next: AdjacentPost | null };
+
+/** The previous (older) and next (newer) published posts relative to one post. */
+export async function getAdjacentPosts(opts: {
+  id: string;
+  publishedAt: Date | null;
+}): Promise<AdjacentPosts> {
+  const pub = opts.publishedAt ?? new Date();
+  const select = { title: true, slug: true, coverImage: true } satisfies Prisma.PostSelect;
+  try {
+    const [prev, next] = await Promise.all([
+      prisma.post.findFirst({
+        where: { ...publishedWhere(), id: { not: opts.id }, publishedAt: { lt: pub } },
+        orderBy: { publishedAt: "desc" },
+        select,
+      }),
+      prisma.post.findFirst({
+        where: { ...publishedWhere(), id: { not: opts.id }, publishedAt: { gt: pub } },
+        orderBy: { publishedAt: "asc" },
+        select,
+      }),
+    ]);
+    return { prev, next };
+  } catch {
+    return { prev: null, next: null };
+  }
+}
+
+export type FeaturedCategory = { category: CategoryWithCount; post: PostCard | null };
+
+export type HomeData = {
+  featured: PostCard[];
+  latest: PostCard[];
+  latestTotalPages: number;
+  trending: PostCard[];
+  popular: PostCard[];
+  categories: CategoryWithCount[];
+  recentlyUpdated: PostCard[];
+  reviews: PostCard[];
+  howto: PostCard[];
+  aiTools: PostCard[];
+  productivity: PostCard[];
+  featuredCategories: FeaturedCategory[];
+};
+
+/** One parallel fetch powering the whole homepage. */
+export async function getHomeData(): Promise<HomeData> {
+  const [featured, latestRes, trending, popular, categories, recentlyUpdated, reviews, howto, aiTools, productivity] =
+    await Promise.all([
+      getFeaturedPosts(6),
+      getPublishedPosts({ perPage: 6 }),
+      getTrendingPosts(5),
+      getPopularPosts(5),
+      getCategoriesWithCounts(),
+      getRecentlyUpdatedPosts(4),
+      getPostsByCategory("reviews", 3),
+      getPostsByCategory("how-to-guides", 3),
+      getPostsByCategory("ai-tools", 3),
+      getPostsByCategory("productivity", 4),
+    ]);
+
+  const topCats = categories
+    .filter((c) => c.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+  const featuredCategories: FeaturedCategory[] = await Promise.all(
+    topCats.map(async (category) => ({ category, post: (await getPostsByCategory(category.slug, 1))[0] ?? null }))
+  );
+
+  return {
+    featured,
+    latest: latestRes.posts,
+    latestTotalPages: latestRes.totalPages,
+    trending,
+    popular,
+    categories,
+    recentlyUpdated,
+    reviews,
+    howto,
+    aiTools,
+    productivity,
+    featuredCategories,
+  };
+}

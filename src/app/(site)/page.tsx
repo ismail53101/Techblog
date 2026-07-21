@@ -1,104 +1,202 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import {
-  getCategoriesWithCounts,
-  getFeaturedPosts,
-  getPopularPosts,
-  getPublishedPosts,
-  getTrendingPosts,
-} from "@/lib/posts";
-import { FeaturedHero } from "@/components/blog/featured-hero";
-import { PostGrid } from "@/components/blog/post-grid";
-import { PostList } from "@/components/blog/post-list";
-import { EmptyState } from "@/components/blog/empty-state";
-import { NewsletterForm } from "@/components/blog/newsletter-form";
-import { buttonVariants } from "@/components/ui/button";
+  ArrowRight,
+  BookOpen,
+  Eye,
+  Flame,
+  History,
+  Layers,
+  LayoutGrid,
+  Mail,
+  Newspaper,
+  Sparkles,
+  Star,
+  Zap,
+} from "lucide-react";
+import { getHomeData } from "@/lib/posts";
+import { sortByCategoryOrder } from "@/lib/category-icons";
 import { siteConfig } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { HeroSlider } from "@/components/blog/hero-slider";
+import { SectionHeading } from "@/components/blog/section-heading";
+import { PostGrid } from "@/components/blog/post-grid";
+import { PostList } from "@/components/blog/post-list";
+import { PostCard } from "@/components/blog/post-card";
+import { CategoryCard } from "@/components/blog/category-card";
+import { FeaturedCategoryCard } from "@/components/blog/featured-category-card";
+import { LoadMoreArticles } from "@/components/blog/load-more-articles";
+import { Reveal } from "@/components/blog/reveal";
+import { NewsletterForm } from "@/components/blog/newsletter-form";
+import { EmptyState } from "@/components/blog/empty-state";
 
-// Render from the live database (Railway's build can't reach the private DB, so
-// static prerender would be empty until revalidation). Keeps the homepage current.
+// Render from the live database (Railway's build can't reach the private DB).
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, latest, trending, popular, categories] = await Promise.all([
-    getFeaturedPosts(5),
-    getPublishedPosts({ perPage: 7 }),
-    getTrendingPosts(5),
-    getPopularPosts(5),
-    getCategoriesWithCounts(),
-  ]);
+  const data = await getHomeData();
+  const heroPosts = data.featured.length >= 2 ? data.featured : data.latest;
+  const hasContent = heroPosts.length > 0 || data.latest.length > 0;
+  const orderedCategories = sortByCategoryOrder(data.categories);
 
-  const heroPosts = featured.length >= 2 ? featured : latest.posts.slice(0, 4);
-  const heroIds = new Set(heroPosts.map((p) => p.id));
-  const latestPosts = latest.posts.filter((p) => !heroIds.has(p.id)).slice(0, 6);
-  const hasContent = heroPosts.length > 0 || latestPosts.length > 0;
+  const themed = [
+    { key: "reviews", title: "Reviews", eyebrow: "Honest verdicts", Icon: Star, href: "/category/reviews", posts: data.reviews },
+    { key: "howto", title: "How-To Guides", eyebrow: "Step by step", Icon: BookOpen, href: "/category/how-to-guides", posts: data.howto },
+    { key: "ai", title: "AI Tools", eyebrow: "Work smarter", Icon: Sparkles, href: "/category/ai-tools", posts: data.aiTools },
+    { key: "prod", title: "Productivity", eyebrow: "Do more with less", Icon: Zap, href: "/category/productivity", posts: data.productivity },
+  ].filter((s) => s.posts.length > 0);
+
+  if (!hasContent) {
+    return (
+      <div className="container py-24">
+        <EmptyState
+          title="No articles published yet"
+          description="Once you publish your first article from the admin dashboard, it will appear here."
+        />
+      </div>
+    );
+  }
 
   return (
     <>
-      {heroPosts.length > 0 && <FeaturedHero posts={heroPosts} />}
+      <h1 className="sr-only">
+        {siteConfig.name} — {siteConfig.tagline}
+      </h1>
 
-      {categories.length > 0 && (
-        <section className="container pt-10">
-          <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <Link
-                key={c.id}
-                href={`/category/${c.slug}`}
-                className="rounded-full border border-border px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-              >
-                {c.name}
-                <span className="ml-1.5 text-xs text-muted-foreground/60">{c.count}</span>
-              </Link>
-            ))}
-          </div>
+      {/* 1 · Hero slider */}
+      <HeroSlider posts={heroPosts} />
+
+      {/* 2 · Latest articles */}
+      {data.latest.length > 0 && (
+        <Reveal>
+          <section className="container py-12 md:py-16" aria-labelledby="latest-heading">
+            <SectionHeading title="Latest articles" eyebrow="Fresh off the press" Icon={Newspaper} href="/blog" />
+            <div id="latest-heading" className="sr-only">
+              Latest articles
+            </div>
+            <PostGrid posts={data.latest} />
+          </section>
+        </Reveal>
+      )}
+
+      {/* 3 · Trending */}
+      {data.trending.length > 0 && (
+        <Reveal>
+          <section className="container pb-12 md:pb-16" aria-label="Trending articles">
+            <SectionHeading title="Trending now" eyebrow="What everyone's reading" Icon={Flame} href="/blog" />
+            <PostGrid posts={data.trending.slice(0, 3)} />
+          </section>
+        </Reveal>
+      )}
+
+      {/* 4 · Most popular */}
+      {data.popular.length > 0 && (
+        <section className="border-y border-border bg-muted/30">
+          <Reveal>
+            <div className="container py-12 md:py-16">
+              <SectionHeading title="Most popular" eyebrow="All-time favourites" Icon={Eye} />
+              <div className="grid gap-6 lg:grid-cols-2">
+                <PostCard post={data.popular[0]} />
+                <div className="rounded-2xl border border-border bg-card p-6 sm:p-7">
+                  <PostList title="Also popular" posts={data.popular.slice(1, 5)} ranked />
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </section>
       )}
 
-      <div className="container grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14">
-        <div className="min-w-0">
-          <div className="mb-6 flex items-end justify-between">
-            <h2 className="font-heading text-2xl font-bold">Latest articles</h2>
-            <Link href="/blog" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-              View all <ArrowRight className="size-4" />
-            </Link>
+      {/* 5 · Browse by category */}
+      {orderedCategories.length > 0 && (
+        <Reveal>
+          <section className="container py-12 md:py-16" aria-label="Browse by category">
+            <SectionHeading title="Browse by category" eyebrow="Find your topic" Icon={LayoutGrid} href="/category" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {orderedCategories.map((c) => (
+                <CategoryCard key={c.id} category={c} />
+              ))}
+            </div>
+          </section>
+        </Reveal>
+      )}
+
+      {/* 6 · Featured categories (each with its latest article) */}
+      {data.featuredCategories.length > 0 && (
+        <section className="border-y border-border bg-muted/30">
+          <Reveal>
+            <div className="container py-12 md:py-16">
+              <SectionHeading title="Featured categories" eyebrow="Editor's picks by topic" Icon={Layers} />
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {data.featuredCategories.map((item) => (
+                  <FeaturedCategoryCard key={item.category.id} item={item} />
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </section>
+      )}
+
+      {/* 7 · Recently updated */}
+      {data.recentlyUpdated.length > 0 && (
+        <Reveal>
+          <section className="container py-12 md:py-16" aria-label="Recently updated">
+            <SectionHeading title="Recently updated" eyebrow="Kept current" Icon={History} href="/blog" />
+            <PostGrid posts={data.recentlyUpdated} className="lg:grid-cols-4" />
+          </section>
+        </Reveal>
+      )}
+
+      {/* 8–11 · Themed category rails */}
+      {themed.map((s, i) => (
+        <section
+          key={s.key}
+          aria-label={s.title}
+          className={cn(i % 2 === 1 && "border-y border-border bg-muted/30")}
+        >
+          <Reveal>
+            <div className="container py-12 md:py-16">
+              <SectionHeading title={s.title} eyebrow={s.eyebrow} Icon={s.Icon} href={s.href} />
+              <PostGrid posts={s.posts.slice(0, 3)} />
+            </div>
+          </Reveal>
+        </section>
+      ))}
+
+      {/* More articles — infinite scroll / load more */}
+      {data.latestTotalPages > 1 && (
+        <Reveal>
+          <section className="container py-12 md:py-16" aria-label="More articles">
+            <SectionHeading title="More articles" eyebrow="Keep exploring" Icon={Newspaper} />
+            <LoadMoreArticles initialPage={1} totalPages={data.latestTotalPages} perPage={6} />
+          </section>
+        </Reveal>
+      )}
+
+      {/* 12 · Newsletter */}
+      <section className="border-t border-border bg-gradient-to-b from-muted/40 to-background">
+        <Reveal>
+          <div className="container py-16 md:py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Mail className="size-6" />
+              </span>
+              <h2 className="mt-4 font-heading text-2xl font-bold tracking-tight md:text-3xl">
+                Get the weekly FixPedia digest
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                The best new guides, reviews, and fixes across {data.categories.length || 15}+ topics — straight to
+                your inbox. No spam, unsubscribe anytime.
+              </p>
+              <NewsletterForm className="mx-auto mt-6 max-w-md" />
+              <div className="mt-6">
+                <Link href="/blog" className={cn(buttonVariants({ variant: "outline" }), "gap-1")}>
+                  Or browse all articles
+                  <ArrowRight className="size-4" />
+                </Link>
+              </div>
+            </div>
           </div>
-
-          {latestPosts.length > 0 ? (
-            <PostGrid posts={latestPosts} priorityCount={0} className="lg:grid-cols-2 xl:grid-cols-3" />
-          ) : !hasContent ? (
-            <EmptyState
-              title="No articles published yet"
-              description="Once you publish your first article from the admin dashboard, it will appear here."
-            />
-          ) : null}
-        </div>
-
-        <aside className="space-y-10">
-          {trending.length > 0 && <PostList title="Trending now" posts={trending} ranked />}
-          {popular.length > 0 && <PostList title="Most popular" posts={popular} />}
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <h3 className="font-heading font-semibold">Stay in the loop</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Weekly guides and reviews. No spam, unsubscribe anytime.
-            </p>
-            <NewsletterForm className="mt-4" />
-          </div>
-        </aside>
-      </div>
-
-      <section className="border-t border-border bg-muted/30">
-        <div className="container flex flex-col items-center gap-4 py-16 text-center">
-          <h2 className="max-w-2xl font-heading text-2xl font-bold text-balance md:text-3xl">
-            {siteConfig.tagline}
-          </h2>
-          <p className="max-w-xl text-muted-foreground">
-            Browse in-depth guides, honest reviews, and practical fixes across {categories.length || 10}+ topics.
-          </p>
-          <Link href="/blog" className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
-            Explore all articles
-          </Link>
-        </div>
+        </Reveal>
       </section>
     </>
   );

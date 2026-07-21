@@ -8,13 +8,13 @@ function stripTrailingSlash(url: string): string {
 }
 
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || "TechBlog",
+  name: process.env.NEXT_PUBLIC_SITE_NAME || "FixPedia",
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-    "In-depth guides, reviews, and how-tos on AI tools, software, security, and the web.",
+    "Practical tech guides, reviews, and fixes for AI tools, Windows, Android, iPhone, software, and cybersecurity.",
   url: stripTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  tagline: "Technology, decoded.",
-  twitter: "@techblog",
+  tagline: "Fix it. Learn it. Master it.",
+  twitter: "@fixpedia",
   themeColor: "#4f46e5",
   locale: "en_US",
   socials: {
@@ -27,17 +27,23 @@ export const siteConfig = {
 
 export const mainNav: { title: string; href: string }[] = [
   { title: "Home", href: "/" },
-  { title: "Blog", href: "/blog" },
+  { title: "Latest Articles", href: "/blog" },
   { title: "Categories", href: "/category" },
   { title: "About", href: "/about" },
   { title: "Contact", href: "/contact" },
+];
+
+export const legalNav: { title: string; href: string }[] = [
+  { title: "Privacy Policy", href: "/privacy" },
+  { title: "Terms & Conditions", href: "/terms" },
+  { title: "Disclaimer", href: "/disclaimer" },
 ];
 
 export const footerNav: { title: string; items: { title: string; href: string }[] }[] = [
   {
     title: "Explore",
     items: [
-      { title: "Latest", href: "/blog" },
+      { title: "Latest Articles", href: "/blog" },
       { title: "Categories", href: "/category" },
       { title: "Search", href: "/search" },
       { title: "RSS Feed", href: "/feed.xml" },
@@ -46,10 +52,16 @@ export const footerNav: { title: string; items: { title: string; href: string }[
   {
     title: "Company",
     items: [
-      { title: "About", href: "/about" },
-      { title: "Contact", href: "/contact" },
+      { title: "About Us", href: "/about" },
+      { title: "Contact Us", href: "/contact" },
+    ],
+  },
+  {
+    title: "Legal",
+    items: [
       { title: "Privacy Policy", href: "/privacy" },
-      { title: "Terms", href: "/terms" },
+      { title: "Terms & Conditions", href: "/terms" },
+      { title: "Disclaimer", href: "/disclaimer" },
     ],
   },
 ];

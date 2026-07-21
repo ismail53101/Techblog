@@ -1,4 +1,4 @@
-# Deploying TechBlog to Vercel
+# Deploying FixPedia to Vercel
 
 A complete, start-to-finish guide to deploying this project on **Vercel** with a free **PostgreSQL** database (Neon) and **Cloudinary** for images. Budget 20–30 minutes; everything here fits on free tiers.
 
@@ -19,7 +19,7 @@ Vercel deploys from a Git repo. From the project folder:
 ```bash
 git init
 git add .
-git commit -m "Initial commit: TechBlog platform"
+git commit -m "Initial commit: FixPedia platform"
 git branch -M main
 git remote add origin https://github.com/<your-username>/techblog.git
 git push -u origin main
@@ -91,7 +91,7 @@ The seed creates your **admin login** (the email/password above), the 10 categor
 | `DATABASE_URL` | pooled Neon URL (+`pgbouncer=true&connection_limit=1`) | 🔒 |
 | `AUTH_SECRET` | first `openssl` output | 🔒 |
 | `AUTH_TRUST_HOST` | `true` | |
-| `NEXT_PUBLIC_SITE_NAME` | `TechBlog` | |
+| `NEXT_PUBLIC_SITE_NAME` | `FixPedia` | |
 | `NEXT_PUBLIC_SITE_DESCRIPTION` | your tagline | |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | your cloud name | |
 | `CLOUDINARY_API_KEY` | your key | 🔒 |

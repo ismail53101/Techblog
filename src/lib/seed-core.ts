@@ -269,7 +269,7 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedResult> {
       role: Role.ADMIN,
       bio: "Editor-in-chief. Writes about AI, security, and the tools that make computing better.",
       avatarUrl: "https://picsum.photos/seed/admin-avatar/200/200",
-      twitter: "techblog",
+      twitter: "fixpedia",
       website: "https://example.com",
     },
   });

@@ -12,18 +12,18 @@ export async function Footer() {
   return (
     <footer className="border-t border-border bg-muted/30">
       <div className="container py-14">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="space-y-4">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
+          <div className="space-y-4 lg:col-span-2">
             <Logo />
             <p className="max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
             <div className="flex items-center gap-2">
-              <a href={siteConfig.socials.twitter} aria-label="Twitter" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground" target="_blank" rel="noopener noreferrer">
+              <a href={siteConfig.socials.twitter} aria-label="Twitter" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
                 <Twitter className="size-4" />
               </a>
-              <a href={siteConfig.socials.github} aria-label="GitHub" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground" target="_blank" rel="noopener noreferrer">
+              <a href={siteConfig.socials.github} aria-label="GitHub" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
                 <Github className="size-4" />
               </a>
-              <a href={siteConfig.socials.youtube} aria-label="YouTube" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground" target="_blank" rel="noopener noreferrer">
+              <a href={siteConfig.socials.youtube} aria-label="YouTube" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
                 <Youtube className="size-4" />
               </a>
               <a href="/feed.xml" aria-label="RSS feed" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
@@ -66,7 +66,7 @@ export async function Footer() {
             <div>
               <h3 className="font-heading text-lg font-semibold">Get the weekly digest</h3>
               <p className="text-sm text-muted-foreground">
-                The best new guides and reviews, straight to your inbox. No spam.
+                The best new guides, reviews, and fixes — straight to your inbox. No spam.
               </p>
             </div>
             <NewsletterForm />
@@ -77,9 +77,10 @@ export async function Footer() {
           <p>
             © {year} {siteConfig.name}. All rights reserved.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
             <Link href="/terms" className="hover:text-foreground">Terms</Link>
+            <Link href="/disclaimer" className="hover:text-foreground">Disclaimer</Link>
             <Link href="/contact" className="hover:text-foreground">Contact</Link>
           </div>
         </div>

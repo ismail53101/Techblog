@@ -1,4 +1,4 @@
-# TechBlog — a production-ready technology blogging platform
+# FixPedia — a production-ready technology blogging platform
 
 A modern, fast, SEO-first blogging CMS built with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **PostgreSQL**, **Prisma**, and **Auth.js (NextAuth v5)**. Publish unlimited articles from a secure admin dashboard — no code required.
 

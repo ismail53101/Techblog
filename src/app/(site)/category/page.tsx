@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/blog/page-header";
 import { EmptyState } from "@/components/blog/empty-state";
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildMetadata({
   title: "Categories",

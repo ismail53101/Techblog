@@ -16,7 +16,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 300;
+// Render from the live database (Railway's build can't reach the private DB, so
+// static prerender would be empty until revalidation). Keeps the homepage current.
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [featured, latest, trending, popular, categories] = await Promise.all([

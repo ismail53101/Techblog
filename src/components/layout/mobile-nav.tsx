@@ -3,11 +3,13 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Github, Hash, Menu, Rss, Search, Twitter, X, Youtube } from "lucide-react";
+import { ChevronRight, Hash, Menu, Search, X } from "lucide-react";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
+import { SocialLinks } from "./social-links";
 import { NewsletterForm } from "@/components/blog/newsletter-form";
-import { legalNav, siteConfig } from "@/lib/constants";
+import { legalNav } from "@/lib/constants";
+import type { SocialLinksSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 type Item = { title: string; href: string };
@@ -21,7 +23,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function MobileNav({ navItems, categories }: { navItems: Item[]; categories: Category[] }) {
+export function MobileNav({
+  navItems,
+  categories,
+  social,
+}: {
+  navItems: Item[];
+  categories: Category[];
+  social: SocialLinksSettings;
+}) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
 
@@ -155,19 +165,8 @@ export function MobileNav({ navItems, categories }: { navItems: Item[]; categori
           </div>
         </div>
 
-        <div className="flex items-center gap-1 border-t border-border px-4 py-4">
-          <a href={siteConfig.socials.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-            <Twitter className="size-4" />
-          </a>
-          <a href={siteConfig.socials.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-            <Github className="size-4" />
-          </a>
-          <a href={siteConfig.socials.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-            <Youtube className="size-4" />
-          </a>
-          <a href="/feed.xml" aria-label="RSS feed" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-            <Rss className="size-4" />
-          </a>
+        <div className="border-t border-border px-4 py-4">
+          <SocialLinks social={social} />
         </div>
       </div>
     </div>

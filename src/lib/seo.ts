@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/constants";
+import type { SocialLinksSettings } from "@/lib/settings";
 import { absoluteUrl } from "@/lib/utils";
 
 type BuildMetaOptions = {
@@ -85,14 +86,17 @@ export function jsonLdWebSite() {
   };
 }
 
-export function jsonLdOrganization() {
+export function jsonLdOrganization(social?: SocialLinksSettings) {
+  const sameAs = social
+    ? [social.github, social.youtube, social.twitter, social.facebook, social.linkedin].filter(Boolean)
+    : [];
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteConfig.name,
     url: siteConfig.url,
     logo: absoluteUrl("/icon.png"),
-    sameAs: [siteConfig.socials.twitter, siteConfig.socials.github, siteConfig.socials.youtube],
+    ...(sameAs.length ? { sameAs } : {}),
   };
 }
 

@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  Share2,
   Users,
   X,
 } from "lucide-react";
@@ -28,7 +29,8 @@ const NAV = [
   { title: "Tags", href: "/admin/tags", icon: Hash },
   { title: "Media", href: "/admin/media", icon: ImageIcon },
   { title: "Users", href: "/admin/users", icon: Users, adminOnly: true },
-  { title: "Settings", href: "/admin/settings", icon: Settings, adminOnly: true },
+  { title: "Settings", href: "/admin/settings", icon: Settings, adminOnly: true, exact: true },
+  { title: "Social Links", href: "/admin/settings/social", icon: Share2, adminOnly: true },
 ];
 
 export function AdminNav({

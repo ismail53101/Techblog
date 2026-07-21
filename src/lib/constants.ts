@@ -17,12 +17,6 @@ export const siteConfig = {
   twitter: "@fixpedia",
   themeColor: "#4f46e5",
   locale: "en_US",
-  socials: {
-    twitter: "https://twitter.com",
-    github: "https://github.com",
-    youtube: "https://youtube.com",
-    rss: "/feed.xml",
-  },
 } as const;
 
 export const mainNav: { title: string; href: string }[] = [
@@ -46,7 +40,7 @@ export const footerNav: { title: string; items: { title: string; href: string }[
       { title: "Latest Articles", href: "/blog" },
       { title: "Categories", href: "/category" },
       { title: "Search", href: "/search" },
-      { title: "RSS Feed", href: "/feed.xml" },
+      { title: "RSS Feed", href: "/rss" },
     ],
   },
   {

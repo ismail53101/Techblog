@@ -73,7 +73,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { ga4Id, gscVerification } = await getSiteSettings();
+  const { ga4Id, gscVerification, social } = await getSiteSettings();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization(social)) }}
         />
       </head>
       <body>

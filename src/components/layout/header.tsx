@@ -1,5 +1,6 @@
 import { getAllCategories } from "@/lib/posts";
 import { mainNav } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/settings";
 import { Logo } from "./logo";
 import { DesktopNav } from "./desktop-nav";
 import { ThemeToggle } from "./theme-toggle";
@@ -7,7 +8,7 @@ import { SearchCommand } from "./search-command";
 import { MobileNav } from "./mobile-nav";
 
 export async function Header() {
-  const categories = await getAllCategories();
+  const [categories, { social }] = await Promise.all([getAllCategories(), getSiteSettings()]);
   const cats = categories.map((c) => ({ name: c.name, slug: c.slug }));
 
   return (
@@ -21,7 +22,7 @@ export async function Header() {
         <div className="ml-auto flex items-center gap-1.5">
           <SearchCommand />
           <ThemeToggle />
-          <MobileNav navItems={mainNav} categories={cats} />
+          <MobileNav navItems={mainNav} categories={cats} social={social} />
         </div>
       </div>
     </header>

@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,6 +110,24 @@ export function SettingsForm({
           </Button>
         </Card>
       </form>
+
+      <Link
+        href="/admin/settings/social"
+        className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+      >
+        <div className="flex items-center gap-3">
+          <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Share2 className="size-5" />
+          </span>
+          <div>
+            <h2 className="font-heading text-lg font-semibold">Social Links</h2>
+            <p className="text-sm text-muted-foreground">
+              Set your GitHub, YouTube, X, Facebook &amp; LinkedIn URLs. Empty ones are hidden.
+            </p>
+          </div>
+        </div>
+        <span className="text-sm font-medium text-primary">Manage →</span>
+      </Link>
 
       <Card className="space-y-4 p-6">
         <div>

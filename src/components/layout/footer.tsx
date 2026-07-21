@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { Github, Rss, Twitter, Youtube } from "lucide-react";
 import { getAllCategories } from "@/lib/posts";
 import { footerNav, siteConfig } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/settings";
 import { Logo } from "./logo";
+import { SocialLinks } from "./social-links";
 import { NewsletterForm } from "@/components/blog/newsletter-form";
 
 export async function Footer() {
-  const categories = (await getAllCategories()).slice(0, 8);
+  const [categories, { social }] = await Promise.all([
+    getAllCategories().then((c) => c.slice(0, 8)),
+    getSiteSettings(),
+  ]);
   const year = new Date().getFullYear();
 
   return (
@@ -16,20 +20,7 @@ export async function Footer() {
           <div className="space-y-4 lg:col-span-2">
             <Logo />
             <p className="max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
-            <div className="flex items-center gap-2">
-              <a href={siteConfig.socials.twitter} aria-label="Twitter" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-                <Twitter className="size-4" />
-              </a>
-              <a href={siteConfig.socials.github} aria-label="GitHub" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-                <Github className="size-4" />
-              </a>
-              <a href={siteConfig.socials.youtube} aria-label="YouTube" target="_blank" rel="noopener noreferrer" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-                <Youtube className="size-4" />
-              </a>
-              <a href="/feed.xml" aria-label="RSS feed" className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
-                <Rss className="size-4" />
-              </a>
-            </div>
+            <SocialLinks social={social} className="-ml-2" />
           </div>
 
           {footerNav.map((col) => (

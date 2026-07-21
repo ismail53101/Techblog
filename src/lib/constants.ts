@@ -69,13 +69,18 @@ export const defaultCategories: { name: string; slug: string }[] = [
   { name: "AI Tools", slug: "ai-tools" },
   { name: "Windows", slug: "windows" },
   { name: "Android", slug: "android" },
-  { name: "iPhone", slug: "iphone" },
-  { name: "Software Reviews", slug: "software-reviews" },
-  { name: "Productivity", slug: "productivity" },
+  { name: "iPhone & iOS", slug: "iphone-ios" },
+  { name: "Software", slug: "software" },
   { name: "Cybersecurity", slug: "cybersecurity" },
-  { name: "Blogging", slug: "blogging" },
   { name: "Troubleshooting", slug: "troubleshooting" },
+  { name: "Reviews", slug: "reviews" },
+  { name: "Productivity", slug: "productivity" },
+  { name: "Downloads", slug: "downloads" },
+  { name: "Blogging", slug: "blogging" },
+  { name: "SEO", slug: "seo" },
   { name: "Web Development", slug: "web-development" },
+  { name: "Internet Tips", slug: "internet-tips" },
+  { name: "How-To Guides", slug: "how-to-guides" },
 ];
 
 export const POSTS_PER_PAGE = 9;

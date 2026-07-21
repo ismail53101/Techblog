@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-heading: "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 42%;
+    --accent: 243 75% 96%;
+    --accent-foreground: 243 60% 30%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 243 75% 59%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6.5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 6.5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 243 75% 68%;
+    --primary-foreground: 240 30% 8%;
+    --secondary: 240 4% 13%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 13%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 243 40% 20%;
+    --accent-foreground: 243 80% 88%;
+    --destructive: 0 63% 47%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 18%;
+    --ring: 243 75% 68%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Subtle custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  .container-prose {
+    @apply mx-auto w-full max-w-3xl px-5;
+  }
+
+  /* Article typography built on @tailwindcss/typography */
+  .prose {
+    @apply text-foreground/90;
+  }
+  .prose :where(h2, h3, h4) {
+    @apply scroll-mt-28 font-heading text-foreground;
+  }
+  .prose :where(a) {
+    @apply font-medium text-primary underline-offset-4 hover:underline;
+  }
+  .prose :where(blockquote) {
+    @apply border-l-primary/60 not-italic text-muted-foreground;
+  }
+  .prose :where(img) {
+    @apply rounded-xl border border-border;
+  }
+  .prose :where(figure figcaption) {
+    @apply text-center text-sm text-muted-foreground;
+  }
+  .prose :where(table) {
+    @apply overflow-hidden rounded-lg text-sm;
+  }
+  .prose :where(thead) {
+    @apply border-b border-border bg-muted;
+  }
+  .prose :where(th, td) {
+    @apply border border-border px-3 py-2;
+  }
+  .prose :where(code):not(pre code) {
+    @apply rounded bg-muted px-1.5 py-0.5 text-[0.85em] font-medium text-foreground before:content-[''] after:content-[''];
+  }
+
+  /* Code blocks — dark in both themes for consistency */
+  .prose :where(pre) {
+    @apply overflow-x-auto rounded-xl border border-white/10 bg-[#0b1020] p-4 text-sm leading-relaxed text-[#e6edf3];
+  }
+  .prose :where(pre code) {
+    @apply bg-transparent p-0 text-inherit;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+  }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+}
+
+/* highlight.js token colors (GitHub Dark palette) */
+.hljs-comment,
+.hljs-quote {
+  color: #8b949e;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-type {
+  color: #ff7b72;
+}
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag,
+.hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: #79c0ff;
+}
+.hljs-title,
+.hljs-section,
+.hljs-title.function_ {
+  color: #d2a8ff;
+}
+.hljs-name,
+.hljs-tag {
+  color: #7ee787;
+}
+.hljs-built_in,
+.hljs-variable,
+.hljs-regexp {
+  color: #ffa657;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 700;
+}

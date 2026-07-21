@@ -1,0 +1,128 @@
+// Prisma schema for the TechBlog platform.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(AUTHOR)
+  bio          String?
+  avatarUrl    String?
+  twitter      String?
+  github       String?
+  website      String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  posts        Post[]
+  media        MediaAsset[]
+
+  @@index([role])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  posts     Post[]
+}
+
+model Post {
+  id              String     @id @default(cuid())
+  title           String
+  slug            String     @unique
+  excerpt         String
+  content         String // Sanitized HTML produced by the rich text editor
+  coverImage      String?
+  coverImageAlt   String?
+  status          PostStatus @default(DRAFT)
+  featured        Boolean    @default(false)
+  readingTime     Int        @default(1) // minutes
+  views           Int        @default(0)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  publishedAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tags       Tag[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([featured])
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  publicId     String   @unique
+  url          String
+  width        Int?
+  height       Int?
+  format       String?
+  bytes        Int?
+  alt          String?
+  folder       String?
+  createdAt    DateTime @default(now())
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+model Subscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  confirmed      Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  unsubscribedAt DateTime?
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

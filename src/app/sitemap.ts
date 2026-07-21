@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { getAllCategories, getAllPublishedPostRefs, getAllTagsWithCounts } from "@/lib/posts";
 import { absoluteUrl } from "@/lib/utils";
 
-export const revalidate = 3600;
+// Always render from the live database so the sitemap reflects the current set
+// of articles, categories, and tags (and updates the moment content changes).
+export const dynamic = "force-dynamic";
 
 type Item = MetadataRoute.Sitemap[number];
 

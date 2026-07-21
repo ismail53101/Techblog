@@ -1,6 +1,7 @@
 import { generateRssFeed } from "@/lib/rss";
 
-export const revalidate = 3600;
+// Always render from the live database so the feed reflects current articles.
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const xml = await generateRssFeed();

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, CornerDownLeft, FileText } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
+import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 type SearchResult = {
@@ -77,6 +78,7 @@ export function SearchCommand() {
   function goToResults() {
     const q = query.trim();
     if (!q) return;
+    trackEvent("search", { search_term: q });
     setOpen(false);
     router.push(`/search?q=${encodeURIComponent(q)}`);
   }

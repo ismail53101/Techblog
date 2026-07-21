@@ -37,6 +37,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# build-generated icons (rasterized from public/favicon.svg by scripts/gen-icons.mjs)
+/public/icon.png
+/public/icon-192.png
+/public/apple-touch-icon.png
+
 # prisma
 /prisma/*.db
 /prisma/*.db-journal

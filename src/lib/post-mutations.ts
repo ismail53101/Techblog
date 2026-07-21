@@ -39,11 +39,13 @@ export function resolvePublish(
   return { status: "DRAFT", publishedAt: publishedAt ?? null };
 }
 
-/** Revalidate the pages affected by a post change so ISR caches refresh. */
+/** Revalidate the pages affected by a post change so ISR caches (and the sitemap) refresh. */
 export function revalidateBlog(slug?: string, categorySlug?: string) {
   revalidatePath("/");
   revalidatePath("/blog");
   revalidatePath("/category");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/feed.xml");
   if (slug) revalidatePath(`/blog/${slug}`);
   if (categorySlug) revalidatePath(`/category/${categorySlug}`);
 }

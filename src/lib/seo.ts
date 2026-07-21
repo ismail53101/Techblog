@@ -146,3 +146,15 @@ export function jsonLdBreadcrumb(items: { name: string; url: string }[]) {
     })),
   };
 }
+
+export function jsonLdFaq(items: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((i) => ({
+      "@type": "Question",
+      name: i.question,
+      acceptedAnswer: { "@type": "Answer", text: i.answer },
+    })),
+  };
+}

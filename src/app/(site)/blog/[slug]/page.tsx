@@ -5,7 +5,9 @@ import { Clock, Eye } from "lucide-react";
 import { getPublishedPostBySlug, getRelatedPosts, incrementViews } from "@/lib/posts";
 import { addHeadingIds, extractToc } from "@/lib/toc";
 import { sanitize } from "@/lib/sanitize";
-import { buildMetadata, jsonLdArticle, jsonLdBreadcrumb } from "@/lib/seo";
+import { buildMetadata, jsonLdArticle, jsonLdBreadcrumb, jsonLdFaq } from "@/lib/seo";
+import { extractFaq } from "@/lib/faq";
+import { TrackView } from "@/components/analytics/track-view";
 import { absoluteUrl, toISO } from "@/lib/utils";
 import { Breadcrumbs, type Crumb } from "@/components/blog/breadcrumbs";
 import { PostBody } from "@/components/blog/post-body";
@@ -50,6 +52,7 @@ export default async function ArticlePage({ params }: Params) {
 
   const safeHtml = addHeadingIds(sanitize(post.content));
   const toc = extractToc(safeHtml);
+  const faq = extractFaq(safeHtml);
   const related = await getRelatedPosts({
     postId: post.id,
     categorySlug: post.category?.slug,
@@ -81,6 +84,8 @@ export default async function ArticlePage({ params }: Params) {
         })}
       />
       <JsonLd data={jsonLdBreadcrumb(crumbs.map((c) => ({ name: c.name, url: c.href || url })))} />
+      {faq.length > 0 && <JsonLd data={jsonLdFaq(faq)} />}
+      <TrackView event="article_view" params={{ slug: post.slug, category: post.category?.name }} />
 
       <article className="container py-8 md:py-12">
         <Breadcrumbs items={crumbs} className="mb-8" />

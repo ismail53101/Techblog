@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 
 export function SearchInput({ initialQuery = "" }: { initialQuery?: string }) {
   const [q, setQ] = React.useState(initialQuery);
@@ -13,6 +14,7 @@ export function SearchInput({ initialQuery = "" }: { initialQuery?: string }) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const query = q.trim();
+    if (query) trackEvent("search", { search_term: query });
     router.push(query ? `/search?q=${encodeURIComponent(query)}` : "/search");
   }
 

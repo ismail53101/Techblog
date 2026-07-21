@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Settings,
   Users,
   X,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV = [
   { title: "Tags", href: "/admin/tags", icon: Hash },
   { title: "Media", href: "/admin/media", icon: ImageIcon },
   { title: "Users", href: "/admin/users", icon: Users, adminOnly: true },
+  { title: "Settings", href: "/admin/settings", icon: Settings, adminOnly: true },
 ];
 
 export function AdminNav({

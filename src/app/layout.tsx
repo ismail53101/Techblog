@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Analytics } from "@/components/analytics/analytics";
 import { siteConfig } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/settings";
 import { jsonLdOrganization, jsonLdWebSite } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -15,12 +18,13 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   keywords: [
     "technology",
-    "how-to",
+    "how-to guides",
     "software reviews",
     "AI tools",
     "cybersecurity",
     "productivity",
     "web development",
+    "troubleshooting",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
@@ -50,7 +54,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icon.png" }],
+    shortcut: ["/favicon.svg"],
+    apple: [{ url: "/apple-touch-icon.png" }],
   },
   manifest: "/manifest.webmanifest",
   alternates: {
@@ -71,7 +76,9 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { ga4Id, gscVerification } = await getSiteSettings();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -81,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        {gscVerification && <meta name="google-site-verification" content={gscVerification} />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite()) }}
@@ -95,6 +103,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Toaster richColors closeButton position="top-center" />
         </ThemeProvider>
+        <Suspense fallback={null}>
+          <Analytics measurementId={ga4Id} />
+        </Suspense>
       </body>
     </html>
   );

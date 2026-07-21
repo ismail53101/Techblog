@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -81,8 +82,11 @@ const CATEGORY_ICON = new Map(CATEGORY_META.map((c) => [c.slug, c.Icon]));
 
 export function MobileNav({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
+  const [mounted, setMounted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [catOpen, setCatOpen] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
 
   // Close the drawer on route change.
   React.useEffect(() => {
@@ -143,21 +147,12 @@ export function MobileNav({ categories }: { categories: Category[] }) {
 
   const categoriesActive = pathname === "/category" || pathname.startsWith("/category/");
 
-  return (
-    <div className="md:hidden">
-      <button
-        type="button"
-        aria-label="Open menu"
-        onClick={() => setOpen(true)}
-        className="inline-flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent"
-      >
-        <Menu className="size-5" />
-      </button>
-
+  const drawer = (
+    <>
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
           open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={close}
@@ -171,7 +166,7 @@ export function MobileNav({ categories }: { categories: Category[] }) {
         aria-label="Site menu"
         aria-hidden={!open}
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-[88%] max-w-sm flex-col bg-background shadow-2xl transition-transform duration-300 ease-out",
+          "fixed inset-y-0 right-0 z-[70] flex w-[88%] max-w-sm flex-col bg-background shadow-2xl transition-transform duration-300 ease-out md:hidden",
           open ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -289,6 +284,24 @@ export function MobileNav({ categories }: { categories: Category[] }) {
           <div className="flex flex-col gap-1">{LEGAL_LINKS.map(renderLink)}</div>
         </nav>
       </div>
+    </>
+  );
+
+  return (
+    <div className="md:hidden">
+      <button
+        type="button"
+        aria-label="Open menu"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className="inline-flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent"
+      >
+        <Menu className="size-5" />
+      </button>
+
+      {/* Rendered in a portal on <body> so the header's backdrop-filter doesn't
+          become the containing block for these fixed-position elements. */}
+      {mounted && createPortal(drawer, document.body)}
     </div>
   );
 }

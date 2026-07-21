@@ -164,7 +164,7 @@ export default async function ArticlePage({ params }: Params) {
             </div>
 
             <div className="mt-10">
-              <AuthorCard author={post.author} />
+              <AuthorCard author={post.author} date={post.publishedAt} />
             </div>
           </div>
 
